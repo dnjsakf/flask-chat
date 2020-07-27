@@ -7,38 +7,44 @@
     <link href="/static/index.css" rel="stylesheet">
     <script src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.10.4/polyfill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
   </head>
   <body>
     <div id="root">
       <div id="my_chat">
         <div class="viewer scroll-wrapper">
-          <ul>
-          </ul>
+          <ul></ul>
         </div>
         <div class="sender">
-          <input type="text" name="message" id="message">
-          <button id="submit">submit</button>
+          <input type="text" name="username" id="username" value="Unknown" class="w3" placeholder="username">
+          <input type="text" name="message" id="message" class="w7" placeholder="message">
+          <button id="submit" class="w2">submit</button>
         </div>
       </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
       /**
        * Constant Variables
        */
        
+      // Life Cycle
       const SOCKET_CONNECT = 'connect';
       const SOCKET_CONNECT_ERROR = 'connect_error';
       const SOCKET_DISCONNECT = 'disconnect';
       const SOCKET_ERROR = 'error';
       
+      // Options
       const SOCKET_TIMEOUT = 60*1000;
       const SOCKET_RECONNECTION = false;
       const SOCKET_RECONNECT_DELAY = 5*1000;
       
+      // Events
+      const EVENT_CONNECTED = 'connected';
+      const EVENT_SET_USERNAME ='set_username';
       const EVENT_SEND_MESSAGE = 'send_message';
       const EVENT_RECV_MESSAGE = 'recv_message';
       
+      // Namespace
       const NAMESPACE_CHAT = '/chat';
       
     </script>
@@ -57,11 +63,9 @@
       );
       
       // Connect
-      socket.on(SOCKET_CONNECT, ( success, sid )=>{
+      socket.on(SOCKET_CONNECT, ()=>{
         console.group(SOCKET_CONNECT);
-        console.log(socket);
-        console.log(success);
-        console.log(sid);
+        console.log( socket );
         console.groupEnd(SOCKET_CONNECT);
       });
       
@@ -70,6 +74,7 @@
         console.group(SOCKET_CONNECT_ERROR);
         console.log(error);
         console.groupEnd(SOCKET_CONNECT_ERROR);
+        
         // Do Reconnection
         setTimeout(() => {
           console.log("do reconnect");
@@ -85,8 +90,10 @@
       });
       
       // Disconnect
-      socket.on(SOCKET_DISCONNECT, () => {
-        console.log(SOCKET_DISCONNECT, "bye...");
+      socket.on(SOCKET_DISCONNECT, ( disconnected ) => {
+        console.group(SOCKET_DISCONNECT);
+        console.log(disconnected);
+        console.groupEnd(SOCKET_DISCONNECT);
       });
   </script>
   <script type="text/javascript" charset="utf-8">
@@ -94,54 +101,83 @@
      * Socket.io
      * Event Handlers 
      **/
-    const makeMessageItem = ( sid, message ) => {
-      const viewer = document.querySelector("#my_chat > .viewer > ul");
-      const listItem = document.createElement("li");
+    const makeMessageItem = ( sid, sender, message ) => {
+      const text = [ sender, message ].join(":");
+
+      const el_viewer = document.querySelector("#my_chat > .viewer > ul");
+      const el_list_item = document.createElement("li");
       
-      listItem.appendChild(document.createTextNode(message));
-      viewer.appendChild(listItem);
+      el_list_item.appendChild(document.createTextNode(text));
+      el_viewer.appendChild(el_list_item);
     }
+
+    /* Socket Event: Connected */
+    socket.on(EVENT_CONNECTED, ({ sid })=>{
+      localStorage.setItem("sid", sid);
+    });
   
     /* Socket Event: Receive Message */
-    socket.on(EVENT_RECV_MESSAGE, ({ sid, message }) => {
+    socket.on(EVENT_RECV_MESSAGE, ({ sid, sender, message }) => {
       console.group(EVENT_RECV_MESSAGE);
-      console.log(sid);
-      console.log(message);
+      console.log({ sid, sender, message });
       console.groupEnd(EVENT_RECV_MESSAGE);
       
-      makeMessageItem( sid, message );
+      makeMessageItem( sid, sender, message );
     });
     
-    /* Handler Submit */
-    const submit = document.querySelector("#submit");
+    /* Handle Submit */
+    const el_submit = document.querySelector("#submit");
     const handleSendMessage = event => {
       event.preventDefault();
       
-      const message = document.querySelector("#message");
-      
+      const el_message = document.querySelector("#message");
+      const message = el_message.value;
+
       /* Socket Event: Send Message */
-      socket.emit(EVENT_SEND_MESSAGE, message.value, (success, retval) => {
+      socket.emit(EVENT_SEND_MESSAGE, message, (success, retval) => {
         console.group(EVENT_SEND_MESSAGE);
-        console.log(success);
-        console.log(retval);
+        console.log({success, retval});
         console.groupEnd(EVENT_SEND_MESSAGE);
         
-        message.value = "";
+        el_message.value = "";
       });
     }
-    submit.removeEventListener('click', handleSendMessage, false);
-    submit.addEventListener('click', handleSendMessage, false);
+    el_submit.removeEventListener('click', handleSendMessage, false);
+    el_submit.addEventListener('click', handleSendMessage, false);
     
-    /* Handler KeyDown */
-    const message = document.querySelector("#message");
+    /* Handle Message */
+    const el_message = document.querySelector("#message");
     const handleEnter = event => {
       if( event.key === "Enter" || event.keyCode === 13 ){
         handleSendMessage( event );
       }
     }
-    message.removeEventListener('keydown', handleEnter, false);
-    message.addEventListener('keydown', handleEnter, false);
-    
+    el_message.removeEventListener('keydown', handleEnter, false);
+    el_message.addEventListener('keydown', handleEnter, false);
+
+    /* Handle Username */
+    const el_username = document.querySelector("#username");
+
+    const stored_username = localStorage.getItem("username");
+    if( stored_username ){
+      socket.emit(EVENT_SET_USERNAME, stored_username, ( success, username )=>{
+        if( success ){
+          localStorage.setItem("username", username);
+        }
+      });
+      el_username.value = stored_username;
+    }
+
+    const handleBlur = event => {
+      socket.emit(EVENT_SET_USERNAME, event.target.value, ( success, username )=>{
+        if( success ){
+          localStorage.setItem("username", username);
+        }
+      });
+    }
+    el_username.removeEventListener('blur', handleBlur, false);
+    el_username.addEventListener('blur', handleBlur, false);
+
   </script>
   </body>
 </html>
