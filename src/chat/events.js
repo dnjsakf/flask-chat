@@ -3,19 +3,28 @@
  * Event Handlers 
  **/
 const makeMessageItem = ({ sid, sender, message }) => {
-  const el_viewer = document.querySelector(".chat-container > .chat-viewer");
-  const el_text_viewer = el_viewer.querySelector(".chat-text-viewer");
-  const el_list_item = document.createElement("li");
-
   const state = store.getState();
-  
-  const text = [ sender, message ].join(":");
   const isMine = ( sid == state.sid );
-    
-  el_list_item.appendChild(document.createTextNode(text));
-  el_list_item.className = isMine ? 'msg-mine' : 'msg-other';
+  const text = [];
   
-  el_text_viewer.appendChild(el_list_item);
+  if( !isMine ){
+    text.push( sender );
+  }
+  text.push( message );
+
+  const el_viewer = document.querySelector(".chat-container > .chat-viewer");
+  const el_text_viewer = el_viewer.querySelector(".chat-msg-viewer");
+  const el_item = document.createElement("li");
+  const el_item_wrapper = document.createElement("div");
+  const el_item_text = document.createElement("a");
+  
+  el_item.classList.add("msg-item", (isMine ? 'msg-mine' : 'msg-other'));
+  el_item_wrapper.className = "msg-wrapper";
+  
+  el_item_text.appendChild(document.createTextNode(text.join(":")));
+  el_item_wrapper.appendChild(el_item_text);
+  el_item.appendChild(el_item_wrapper);
+  el_text_viewer.appendChild(el_item);
   
   el_viewer.scrollTop = el_viewer.scrollHeight;
 }
@@ -27,8 +36,6 @@ const emitSendMessage = ( message, cb ) => {
 
 /* Socket Emit Event: Set Username */
 const emitSetUsername = ( username, cb ) => {
-  console.log(EVENT_EMIT_SET_USERNAME, { username });
-  
   socket.emit(EVENT_EMIT_SET_USERNAME, username, cb);
 }
 
@@ -55,10 +62,12 @@ const handleSendMessage = event => {
   const el_message = document.querySelector("#message");
   const message = el_message.value;
 
-  emitSendMessage(message, (success, retval) => {
-    el_message.value = "";
-    el_message.focus();
-  });
+  if( message ){
+    emitSendMessage(message, (success, retval) => {
+      el_message.value = "";
+      el_message.focus();
+    });
+  }
 }
 el_send.addEventListener('click', handleSendMessage, false);
 
@@ -70,7 +79,7 @@ const handleEnter = event => {
     handleSendMessage( event );
   }
 }
-el_message.addEventListener('keydown', handleEnter, false);
+el_message.addEventListener('keypress', handleEnter, false);
 
 
 /* Handle Change Username */

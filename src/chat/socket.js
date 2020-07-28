@@ -19,7 +19,7 @@ socket.on(SOCKET_CONNECT, ()=>{
     sid,
     loggedIn: new Date(),
   }));
-  
+
   console.log(SOCKET_CONNECT, { sid, socket } );
 });
 
