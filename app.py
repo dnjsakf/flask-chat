@@ -1,18 +1,33 @@
+import os
 import dotenv
 import socketio
 import pprint
 
-from flask import Flask, send_from_directory
+from flask import Flask, url_for, render_template
 
 app = Flask(
   __name__,
   static_url_path="/static/",
-  static_folder="./src",
-  )
+  static_folder="src",
+  template_folder="src"
+)
+
+@app.context_processor
+def override_url_for():
+  return dict(url_for=dated_url_for)
+
+def dated_url_for(endpoint, **values):
+  if endpoint == 'static':
+    print( values )
+    filename = values.get('filename', None)
+    if filename:
+      file_path = os.path.join(app.static_folder, filename)
+      values['q'] = int(os.stat(file_path).st_mtime)
+  return url_for(endpoint, **values)
 
 @app.route('/', methods=["GET","POST"])
 def index():
-  return send_from_directory(app.static_folder, "index.html")
+  return render_template("index.html")
 
 sio = socketio.Server(async_mode='threading')
 
