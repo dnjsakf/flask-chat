@@ -12,19 +12,19 @@ const makeMessageItem = ({ sid, sender, message }) => {
   }
   text.push( message );
 
-  const el_viewer = document.querySelector(".chat-container > .chat-viewer");
-  const el_text_viewer = el_viewer.querySelector(".chat-msg-viewer");
-  const el_item = document.createElement("li");
-  const el_item_wrapper = document.createElement("div");
-  const el_item_text = document.createElement("a");
+  const el_viewer = document.querySelector(".chat-msg-container > .chat-msg-wrapper");
+  const el_msg_list = el_viewer.querySelector(".chat-msg-list");
+  const el_msg_item = document.createElement("li");
+  const el_msg_item_wrapper = document.createElement("div");
+  const el_msg_item_text = document.createElement("a");
   
-  el_item.classList.add("msg-item", (isMine ? 'msg-mine' : 'msg-other'));
-  el_item_wrapper.className = "msg-wrapper";
+  el_msg_item_wrapper.className = "chat-msg-item-wrapper";
+  el_msg_item.classList.add("chat-msg-item", (isMine ? 'msg-mine' : 'msg-other'));
   
-  el_item_text.appendChild(document.createTextNode(text.join(":")));
-  el_item_wrapper.appendChild(el_item_text);
-  el_item.appendChild(el_item_wrapper);
-  el_text_viewer.appendChild(el_item);
+  el_msg_item_text.appendChild(document.createTextNode(text.join(":")));
+  el_msg_item_wrapper.appendChild(el_msg_item_text);
+  el_msg_item.appendChild(el_msg_item_wrapper);
+  el_msg_list.appendChild(el_msg_item);
   
   el_viewer.scrollTop = el_viewer.scrollHeight;
 }

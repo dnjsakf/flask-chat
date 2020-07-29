@@ -14,13 +14,22 @@
   <body>
     <div id="root">
       <div id="my_chat" class="chat-container">
-        <div class="chat-viewer scroll-wrapper">
-          <ul class="chat-msg-viewer"></ul>
+        <div class="chat-nav-container">
+          <ul class="chat-nav-list">
+          {% for item in rooms %}
+            <li class="chat-nav-item" index="{{ idx }}"><a href="#{{ item['title'] }}">{{ item["title"] }}</a></li>
+          {% endfor %}
+          </ul>
         </div>
-        <div class="chat-sender">
-          <input type="text" name="username" id="username" value="Unknown" class="w3" placeholder="username">
-          <input type="text" name="message" id="message" class="w7" placeholder="message">
-          <button id="send" class="w2">send</button>
+        <div class="chat-msg-container">
+          <div class="chat-msg-wrapper scroll-wrapper">
+            <ul class="chat-msg-list"></ul>
+          </div>
+          <div class="chat-msg-controller">
+            <input type="text" name="username" id="username" class="w3" placeholder="username">
+            <input type="text" name="message" id="message" class="w7" placeholder="message">
+            <button id="send" class="w2">send</button>
+          </div>
         </div>
       </div>
     </div>

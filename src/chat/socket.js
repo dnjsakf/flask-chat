@@ -50,6 +50,4 @@ socket.on(SOCKET_DISCONNECT, disconnected => {
   dispatch( userActions.clearUser() );
   
   console.log(SOCKET_DISCONNECT, { disconnected });
-  
-  setTimeout(()=>{ console.log( store.getState() ) }, 3000);
 });
