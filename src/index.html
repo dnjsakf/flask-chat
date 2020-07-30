@@ -17,7 +17,7 @@
         <div class="chat-nav-container">
           <ul class="chat-nav-list">
           {% for item in rooms %}
-            <li class="chat-nav-item" index="{{ idx }}"><a href="#{{ item['title'] }}">{{ item["title"] }}</a></li>
+            <li class="chat-nav-item"><a href="#{{ item['title'] }}" room="{{ item['title'] }}">{{ item["title"] }}</a></li>
           {% endfor %}
           </ul>
         </div>

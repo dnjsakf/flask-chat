@@ -6,8 +6,8 @@ const UserReducer = (()=>{
   const defaultState = {
     sid: null,
     name: DEFAULT_USER_NAME,
+    room: DEFAULT_USER_ROOM,
     auth: DEFAULT_USER_AUTH,
-    loc: DEFAULT_USER_LOC,
     loggedIn: null,
   }
 
@@ -18,7 +18,7 @@ const UserReducer = (()=>{
     SET_SID: "SET_SID",
     SET_NAME: "SET_NAME",
     SET_AUTH: "SET_AUTH",
-    SET_LOC: "SET_LOC",
+    SET_ROOM: "SET_ROOM",
     SET_LOGGED_IN: "SET_LOGGED_IN",
   }
 
@@ -47,7 +47,7 @@ const UserReducer = (()=>{
         auth => auth,
         auth => { type: "string", auth }
       ],
-      [types.SET_LOC]: [
+      [types.SET_ROOM]: [
         room => room,
         room => { type: "string", room }
       ],
@@ -96,7 +96,7 @@ const UserReducer = (()=>{
         )
       ],
       [
-        actions.setLoc
+        actions.setRoom
         , ( state, action ) => (
           Object.assign({}, state, {
             loc: action.payload

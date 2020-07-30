@@ -14,13 +14,19 @@ const HandleMessageEvent = socket => {
   } = UserReducer;
   
   /** Make Message **/
-  const makeMessageItem = ({ sid, sender, message }) => {
+  const makeMessageItem = ({ sender, message }) => {
     const state = store.getState();
+
+    const {
+      sid,
+      username: sent_username,
+    } = sender;
+
     const isMine = ( sid == userSelector.getSid(state) );
     const text = [];
     
     if( !isMine ){
-      text.push( sender );
+      text.push( sent_username );
     }
     text.push( message );
 
@@ -52,7 +58,7 @@ const HandleMessageEvent = socket => {
   }
 
   /** Socket On Event: Receive Message **/
-  socket.on(EVENT_EMIT_RECV_MESSAGE, makeMessageItem);
+  socket.on(EVENT_ON_RECV_MESSAGE, makeMessageItem);
 
   /** Socket On Event: Connected **/
   socket.on(EVENT_ON_CONNECTED, ({ sid })=>{
@@ -61,8 +67,6 @@ const HandleMessageEvent = socket => {
     const el_username = document.querySelector("#username");
     
     el_username.value = name;
-    
-    console.log( EVENT_ON_CONNECTED, { sid, name } );
   });
 
   /** Handle Send **/
@@ -94,7 +98,7 @@ const HandleMessageEvent = socket => {
   /** Handle Change Username **/
   const el_username = document.querySelector("#username");
   const handleChangeUsername = event => {
-    const username = event.target.value;
+    const { value: username } = event.target;
     
     emitSetUsername(username, ( success, s_username )=>{
       if( success ){
@@ -104,4 +108,22 @@ const HandleMessageEvent = socket => {
   }
   el_username.addEventListener('blur', handleChangeUsername, false);
 
+  /** Handle Enter Rooms  **/
+  const el_nav_items = document.querySelectorAll(".chat-nav-item > a");
+  const handleEnterRoom = event => {
+    event.preventDefault();
+    
+    const room = event.target.getAttribute("room");
+
+    socket.emit(EVENT_EMIT_ENTER_ROOM, room, ( success, msg )=>{
+      if( success ){
+        console.log( EVENT_EMIT_ENTER_ROOM, msg );
+        
+        dispatch( userActions.setRoom(room) );
+      }
+    });
+  }
+  Array.from(el_nav_items).forEach( nav_item => {
+    nav_item.addEventListener('click', handleEnterRoom, false);
+  });
 }
