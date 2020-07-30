@@ -1,120 +1,143 @@
-const { createActions, handleActions } = ReduxActions;
+const UserReducer = (()=>{
+  /** Redux Modules **/
+  const { createActions, handleActions } = ReduxActions;
 
-/* Default State */
-const userDefaultState = {
-  sid: null,
-  name: DEFAULT_USER_NAME,
-  auth: DEFAULT_USER_AUTH,
-  loc: DEFAULT_USER_LOC,
-  loggedIn: null,
-}
-
-/* Action Option */
-const userActionOption = {
-  prefix: "user",
-  namespace: "/",
-}
-
-/* Action Types */
-const SET_USER = "SET_USER";
-const CLEAR_USER = "CLEAR_USER";
-const SET_SID = "SET_SID";
-const SET_NAME = "SET_NAME";
-const SET_AUTH = "SET_AUTH";
-const SET_LOC = "SET_LOC";
-const SET_LOGGED_IN = "SET_LOGGED_IN";
-
-/* Actions */
-const userActions = createActions(
-  {
-    [SET_USER]: [
-      user => user,
-      user => { type: "string", user }
-    ],
-    [SET_SID]: [
-      sid => sid,
-      sid => { type: "string", sid }
-    ],
-    [SET_NAME]: [
-      name => name,
-      name => { type: "string", name }
-    ],
-    [SET_AUTH]: [
-      auth => auth,
-      auth => { type: "string", auth }
-    ],
-    [SET_LOC]: [
-      room => room,
-      room => { type: "string", room }
-    ],
-    [SET_LOGGED_IN]: [
-      logged_in => logged_in,
-      logged_in => { type: "date", logged_in }
-    ],
-    [CLEAR_USER]: null
+  /** Default State **/
+  const defaultState = {
+    sid: null,
+    name: DEFAULT_USER_NAME,
+    auth: DEFAULT_USER_AUTH,
+    loc: DEFAULT_USER_LOC,
+    loggedIn: null,
   }
-  , userActionOption
-);
 
-/* Reducer */
-const userReducer = handleActions(
-  new Map([
-    [
-      userActions.setUser
-      , ( state, action ) => (
-        Object.assign({}, state, {
-          ...action.payload
-        })
-      )
-    ],
-    [
-      userActions.setSid
-      , ( state, action ) => (
-        Object.assign({}, state, {
-          sid: action.payload
-        })
-      )
-    ],
-    [
-      userActions.setName
-      , ( state, action ) => (
-        Object.assign({}, state, {
-          name: action.payload
-        })
-      )
-    ],
-    [
-      userActions.setAuth
-      , ( state, action ) => (
-        Object.assign({}, state, {
-          auth: action.payload
-        })
-      )
-    ],
-    [
-      userActions.setLoc
-      , ( state, action ) => (
-        Object.assign({}, state, {
-          loc: action.payload
-        })
-      )
-    ],
-    [
-      userActions.setLoggedIn
-      , ( state, action ) => (
-        Object.assign({}, state, {
-          loggedIn: action.payload
-        })
-      )
-    ],
-    [
-      userActions.clearUser
-      , ( state, action ) => (
-        userDefaultState
-      )
-    ],
-  ])
-  , userDefaultState
-  , userActionOption
-);
+  /** Action Types **/
+  const types = {
+    SET_USER: "SET_USER",
+    CLEAR_USER: "CLEAR_USER",
+    SET_SID: "SET_SID",
+    SET_NAME: "SET_NAME",
+    SET_AUTH: "SET_AUTH",
+    SET_LOC: "SET_LOC",
+    SET_LOGGED_IN: "SET_LOGGED_IN",
+  }
+
+  /** Action Options **/
+  const options = {
+    prefix: "user",
+    namespace: "/",
+  }
+
+  /** Actions **/
+  const actions = createActions(
+    {
+      [types.SET_USER]: [
+        user => user,
+        user => { type: "string", user }
+      ],
+      [types.SET_SID]: [
+        sid => sid,
+        sid => { type: "string", sid }
+      ],
+      [types.SET_NAME]: [
+        name => name,
+        name => { type: "string", name }
+      ],
+      [types.SET_AUTH]: [
+        auth => auth,
+        auth => { type: "string", auth }
+      ],
+      [types.SET_LOC]: [
+        room => room,
+        room => { type: "string", room }
+      ],
+      [types.SET_LOGGED_IN]: [
+        logged_in => logged_in,
+        logged_in => { type: "date", logged_in }
+      ],
+      [types.CLEAR_USER]: null
+    }
+    , options
+  );
+
+  /** Reducer **/
+  const reducer = handleActions(
+    new Map([
+      [
+        actions.setUser
+        , ( state, action ) => (
+          Object.assign({}, state, {
+            ...action.payload
+          })
+        )
+      ],
+      [
+        actions.setSid
+        , ( state, action ) => (
+          Object.assign({}, state, {
+            sid: action.payload
+          })
+        )
+      ],
+      [
+        actions.setName
+        , ( state, action ) => (
+          Object.assign({}, state, {
+            name: action.payload
+          })
+        )
+      ],
+      [
+        actions.setAuth
+        , ( state, action ) => (
+          Object.assign({}, state, {
+            auth: action.payload
+          })
+        )
+      ],
+      [
+        actions.setLoc
+        , ( state, action ) => (
+          Object.assign({}, state, {
+            loc: action.payload
+          })
+        )
+      ],
+      [
+        actions.setLoggedIn
+        , ( state, action ) => (
+          Object.assign({}, state, {
+            loggedIn: action.payload
+          })
+        )
+      ],
+      [
+        actions.clearUser
+        , ( state, action ) => (
+          defaultState
+        )
+      ],
+    ])
+    , defaultState
+    , options
+  );
   
+  /** Selectors **/
+  const selectors = {
+    getName: state => state.user.name,
+    getSid: state => state.user.sid,
+    getAuth: state => state.user.auth,
+    getLoc: state => state.user.loc,
+    getLoggedIn: state => state.user.loggedIn,
+  }
+  
+  /** Return **/
+  return {
+    defaultState,
+    types,
+    options,
+    actions,
+    reducer,
+    selectors,
+  }
+})();

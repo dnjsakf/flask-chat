@@ -1,14 +1,12 @@
-const { combineReducers } = Redux;
+const CreateStore = reducer =>{  
+  /** Redux Modules **/
+  const { createStore } = Redux;
+  
+  /** Store **/
+  const store = createStore(
+    reducer,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  );
 
-const rootReducer = combineReducers({
-  user: userReducer,
-});
-
-/** Store **/
-const store = Redux.createStore(
-  userReducer,
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-);
-
-/** Dispatch **/
-const { dispatch } = store;
+  return store;
+}
