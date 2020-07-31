@@ -99,7 +99,7 @@ const UserReducer = (()=>{
         actions.setRoom
         , ( state, action ) => (
           Object.assign({}, state, {
-            loc: action.payload
+            room: action.payload
           })
         )
       ],
@@ -127,7 +127,7 @@ const UserReducer = (()=>{
     getName: state => state.user.name,
     getSid: state => state.user.sid,
     getAuth: state => state.user.auth,
-    getLoc: state => state.user.loc,
+    getRoom: state => state.user.room,
     getLoggedIn: state => state.user.loggedIn,
   }
   

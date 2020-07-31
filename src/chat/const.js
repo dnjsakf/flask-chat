@@ -19,10 +19,13 @@ const EVENT_ON_CONNECTED = 'connected';
 /** Emit Events **/
 const EVENT_EMIT_SET_USERNAME ='set_username';
 const EVENT_EMIT_SEND_MESSAGE = 'send_message';
-const EVENT_ON_RECV_MESSAGE = 'recv_message';
+const EVENT_ON_RECEIVE_MESSAGE = 'receive_message';
 
 const EVENT_EMIT_ENTER_ROOM = 'enter_room';
 const EVENT_EMIT_LEAVE_ROOM = 'leave_room';
+
+const EVENT_ON_ROOM_HELLO = 'room_hello';
+const EVENT_ON_ROOM_BYE = 'room_bye';
 
 /** Namespaces **/
 const NAMESPACE_CHAT = '/chat';
@@ -30,4 +33,4 @@ const NAMESPACE_CHAT = '/chat';
 /** Defaults **/
 const DEFAULT_USER_NAME = 'Unknown';
 const DEFAULT_USER_AUTH = 'normal';
-const DEFAULT_USER_ROOM = 'robby';
+const DEFAULT_USER_ROOM = 'lobby';
