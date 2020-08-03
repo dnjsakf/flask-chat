@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 
 def create_app(option={}, socket_option=None):
   app = Flask( __name__, **option )
@@ -11,6 +12,11 @@ def create_app(option={}, socket_option=None):
 
       sio = create_sio(**socket_option)
       app.wsgi_app = WSGIApp(sio, app.wsgi_app)
+
+    # Set CORS
+    CORS(app=app, resources={
+      r"*": { "origin": "*" }
+    })
     
     # Set Routes
     from .routes import routes

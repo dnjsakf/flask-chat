@@ -2,43 +2,67 @@
 const store = CreateStore( rootReducer );
 
 /** Initialize **/
-const MyChat = ( options ) => {  
-  /** Set Cookies **/
-  const cookies = {}
-  const init_cookies = () => {
-    unescape(document.cookie).replace(/\s/g, "").split(";").forEach(( cookie )=>{ 
-      const splited = cookie.split("=");
-      cookies[splited[0]] = splited[1];
-    });
-  }
+const MyChat = ( options ) => {
+  /** Variables **/
+  let socket = null;
+  let events = null;
+  let handlers = null;
+
+  /** Redux **/
+  const { dispatch } = store;
   
+  /** Reducers **/
+  const {
+    selectors: userSelector,
+    actions: userActions
+  } = UserReducer;
+
   /** Set Username **/
-  const init_username = () => {
+  const init_username = ( username ) => {
+    const cookies = MyUtils.getCookies();
     const el_username = document.querySelector("#username");
-    el_username.value = ( cookies.username || DEFAULT_USER_NAME );
+    const val_username = ( username || cookies.username || DEFAULT_USER_NAME )
+
+    el_username.value = val_username;
     
-    console.log( el_username, el_username.value );
+    dispatch( userActions.setName( val_username ) );
   }
   
   /** Set Socket **/
   const init_socket = () => {
-    const socket = MySocket({
+    const username = userSelector.getName(store.getState());
+
+    console.log( username );
+
+    const __socket = MySocket({
+      //host: "http://localhost:3000",
       namespace: NAMESPACE_CHAT,
       options: {
+        path: "/socket.io/",
         reconnection: SOCKET_RECONNECTION,
         timeout: SOCKET_TIMEOUT,
       },
+      params: {
+        username: username
+      }
     });
-    socket.init()
-    const events = socket.getEvents();
-    console.log( events );
+
+    __socket.init();
+    
+    return __socket;
+  }
+
+  const __initialize = () => {
+    init_username();
+
+    socket = init_socket();
+    events = socket.getEvents();
+    handlers = MyHandlers(events);
   }
   
   return {
     init: ()=>{
-      init_cookies();
-      init_username();
-      init_socket();      
+      __initialize();
     },
   }
 }

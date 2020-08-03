@@ -1,18 +1,51 @@
-
 const MyUtils = (() => {
+  /** Get Cookies **/
+  const getCookies = () => {
+    const __cookies = {}
+    unescape(document.cookie).replace(/\s/g, "").split(";").forEach(( cookie )=>{ 
+      const splited = cookie.split("=");
+
+      __cookies[splited[0]] = splited[1];
+    });
+
+    return __cookies;
+  }
+
   /** Save Cookie **/
   const saveCookie = ( cookies ) => {
-      fetch('/cookie', {
-        method: 'POST',
-        body: JSON.stringify(cookies),
-        headers: new Headers({
-          "content-type": "application/json; charset=utf-8"
-        })
-    }).then(function(response) {
-        console.log( arguments )
-    });
+    if( cookies && cookies instanceof Object ){
+      const __cookies = JSON.stringify(
+        Object.keys(cookies).map( key => ({
+          key: key,
+          value: escape(cookies[key]).toString()
+        }))
+      );
+      
+      if( __cookies.length > 0 ){
+        fetch('/cookie', {
+          method: 'POST',
+          body: __cookies,
+          headers: new Headers({
+            "content-type": "application/json; charset=utf-8"
+          })
+        }).then(function(response) {
+            console.log( arguments )
+        });
+      }
+    }
   }
-  
+
+  /** Serialize Object **/
+  const serialize = ( obj ) => {
+    let datas = [];
+    if( obj instanceof Object ){
+      datas = Object.keys( obj ).map( key => (
+        [encodeURIComponent(key), encodeURIComponent(obj[key])].join("=")
+      ));
+    }
+    return datas.join("&");
+  }
+
   /** Make Message Element **/
   const makeMessageItem = props => {
     const {
@@ -46,7 +79,6 @@ const MyUtils = (() => {
       message,
     } = props;
     
-    //const client_sid = userSelector.getSid(store.getState());
     const isMine = ( sender.sid == client_sid );
     
     const options = {
@@ -56,8 +88,12 @@ const MyUtils = (() => {
     
     makeMessageItem( options );
   }
+
   return {
+    getCookies,
     saveCookie,
+    serialize,
+    makeMessageItem,
     makeMessage,
   }
 })();

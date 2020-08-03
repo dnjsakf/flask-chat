@@ -28,7 +28,7 @@ const EVENT_ON_ROOM_HELLO = 'room_hello';
 const EVENT_ON_ROOM_BYE = 'room_bye';
 
 /** Namespaces **/
-const NAMESPACE_CHAT = '/chat';
+const NAMESPACE_CHAT = 'chat';
 
 /** Defaults **/
 const DEFAULT_USER_NAME = 'Unknown';
